@@ -1,0 +1,44 @@
+# Nama workflow yang akan tampil di tab "Actions" GitHub
+name: Android CI Build
+
+# Pemicu: Kapan workflow ini harus dijalankan
+on:
+  push:
+    branches: [ "main", "master" ] # Jalankan saat ada push ke branch main atau master
+  pull_request:
+    branches: [ "main", "master" ] # Jalankan saat ada pull request ke branch main atau master
+
+jobs:
+  # Nama tugas (bisa apa saja, misal: 'build' atau 'compile')
+  build:
+    # Tentukan sistem operasi virtual machine yang akan digunakan
+    runs-on: ubuntu-latest
+
+    steps:
+      # Langkah 1: Mengunduh (checkout) kode dari repositori Anda
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Langkah 2: Menyiapkan Java Development Kit (JDK) yang dibutuhkan untuk Gradle
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # Langkah 3: (Opsional tapi sangat direkomendasikan) Cache Gradle untuk mempercepat build
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      # Langkah 4: Menjalankan perintah build Gradle
+      # Perintah ini akan membangun APK versi debug
+      # `./gradlew` adalah skrip yang akan mengunduh dan menjalankan versi Gradle yang tepat
+      - name: Build with Gradle
+        run: ./gradlew app:assembleDebug
+
+      # (Opsional) Langkah 5: Mengunggah artefak build (file APK)
+      # - name: Upload APK
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: app-debug.apk
+      #     path: app/build/outputs/apk/debug/app-debug.apk
